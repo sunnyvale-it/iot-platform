@@ -21,10 +21,20 @@ services:
     volumes:
       - ./influxdb/data:/var/lib/influxdb
       - ./influxdb/conf/provisioning/initdb:/docker-entrypoint-initdb.d
+    environment:
+      - INFLUXDB_DB=${INFLUXDB_DB}
+      - INFLUXDB_USER=${INFLUXDB_USER}
+      - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
   telegraf:
     image: telegraf
+    container_name: telegraf
     volumes:
       - ./telegraf/conf:/etc/telegraf:ro
+    environment:
+      - SENSORS_TOPIC=${SENSORS_TOPIC}
+      - INFLUXDB_DB=${INFLUXDB_DB}
+      - INFLUXDB_USER=${INFLUXDB_USER}
+      - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
   grafana:
     build: 
       context: './grafana/'
