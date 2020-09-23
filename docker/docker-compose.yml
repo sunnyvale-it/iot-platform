@@ -25,6 +25,8 @@ services:
       - INFLUXDB_DB=${INFLUXDB_DB}
       - INFLUXDB_USER=${INFLUXDB_USER}
       - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
+    networks:
+      - iot_platform
   telegraf:
     image: telegraf
     container_name: telegraf
@@ -35,6 +37,10 @@ services:
       - INFLUXDB_DB=${INFLUXDB_DB}
       - INFLUXDB_USER=${INFLUXDB_USER}
       - INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}
+    depends_on:   
+      - mosquitto
+    networks:
+      - iot_platform
   grafana:
     build: 
       context: './grafana/'
@@ -52,7 +58,8 @@ services:
       - mosquitto
       #- telegraf
       #- influxdb
-  #nodered:
+    networks:
+      - iot_platform
   chronograf:
     image: chronograf:latest
     ports:
@@ -65,5 +72,18 @@ services:
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_USERNAME=${INFLUXDB_USER}
       - INFLUXDB_PASSWORD=${INFLUXDB_USER_PASSWORD}
+    networks:
+      - iot_platform
+  nodered:
+    image: nodered/node-red
+    ports:
+      - 1880:1880
+    container_name: nodered
+    volumes:
+      - ./nodered/data:/data
+    depends_on:   
+      - mosquitto
+    networks:
+      - iot_platform
 networks:
   iot_platform:
